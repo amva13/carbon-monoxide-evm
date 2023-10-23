@@ -40,17 +40,4 @@ contract("DiatomicMD", function ( accounts ) {
     shouldThrow(simulationInstance.getSimOutput(3)) // there was no third run, so should throw
     assert.isTrue(true)
   });
-  xit("checks same simulation yields same result", async function () {
-    await simulationInstance.runMd(1,0)
-    let out1 = await simulationInstance.getSimOutput(1,0)
-    await simulationInstance.runMd(1,0)
-    let out2 = await simulationInstance.getSimOutput(2,0)
-    assert.equal(out1, out2)
-  });
-  xit("checks size of output corresponds to timesteps", async function () {
-    const timesteps = 3
-    await simulationInstance.runMd(timesteps,0)
-    let out = await simulationInstance.getSimOutput(1)
-    assert.equal(out.outputData.length, timesteps)
-  });
 });

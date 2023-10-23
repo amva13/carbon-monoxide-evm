@@ -178,13 +178,13 @@ contract DiatomicMD {
 
     // @notice Retrieves the results of a previous run.
     /// @param runNum The number of the run to retrieve results for.
-    function getSimOutput(uint256 runNum) public returns (DiatomicMDOutput memory output) {
+    function getSimOutput(uint256 runNum) public view returns (uint256[] memory output) {
       require(runNum > 0, "runNum must be greater than 0");
       require(runNum <= runCount, "No such run exists.");
-      return DiatomicMDOutput(runCount,simulationOutput[runNum]);
+      return simulationOutput[runNum];
     }
 
-    function getSimOutput(uint256 runNum, uint idx) public returns (uint256 output) {
+    function getSimOutput(uint256 runNum, uint idx) public view returns (uint256 output) {
       require(runNum > 0, "runNum must be greater than 0");
       require(runNum <= runCount, "No such run exists.");
       return simulationOutput[runNum][idx];
