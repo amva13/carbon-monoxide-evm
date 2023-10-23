@@ -10,7 +10,15 @@ library SafeMathQuad {
   uint constant public _DEFAULT_PRECISION = 0;
   uint constant public _PRECISION = _DEFAULT_PRECISION;
 
-  function getValueBytes(uint256 val, uint precision) public pure returns (bytes16 valBytes) {
+  function toInt(bytes16 num) public pure returns (int256 result) {
+    return ABDKMathQuad.to128x128(num);
+  }
+
+  function toUint(bytes16 num) public pure returns (uint256 result) {
+    return ABDKMathQuad.toUInt(num);
+  }
+
+  function getUintValueBytes(uint256 val, uint precision) public pure returns (bytes16 valBytes) {
 
       bytes16 byteVal = ABDKMathQuad.fromUInt(val);
       if (precision > 0) {
@@ -20,11 +28,33 @@ library SafeMathQuad {
       return byteVal;
   }
 
-  function convertValuesToBytes(uint256[] memory vals, uint precision) public pure returns (bytes16[] memory res) {
+  function getIntValueBytes(int256 val, uint precision) public pure returns (bytes16 valBytes) {
+    bytes16 byteVal = ABDKMathQuad.fromInt(val);
+      if (precision > 0) {
+          int p = 10;
+          for(uint i=0; i < precision; i++){
+            p*=10;
+          }
+          bytes16 bytePrec = ABDKMathQuad.fromInt(p);
+          byteVal = byteVal.div(bytePrec);
+      }
+      return byteVal;
+  }
+
+  function convertUintValuesToBytes(uint256[] memory vals, uint precision) public pure returns (bytes16[] memory res) {
     require(vals.length > 0, 'SafeMathQuad: convertValuesToBytes - array length must be greater than 0');
     bytes16[] memory out = new bytes16[](vals.length);
     for (uint i=0; i<vals.length; i++) {
-      out[i] = getValueBytes(vals[i], precision);
+      out[i] = getUintValueBytes(vals[i], precision);
+    }
+    return out;
+  }
+
+  function convertIntValuesToBytes(int256[] memory vals, uint precision) public pure returns (bytes16[] memory res) {
+    require(vals.length > 0, 'SafeMathQuad: convertValuesToBytes - array length must be greater than 0');
+    bytes16[] memory out = new bytes16[](vals.length);
+    for (uint i=0; i<vals.length; i++) {
+      out[i] = getIntValueBytes(vals[i], precision);
     }
     return out;
   }
@@ -33,33 +63,114 @@ library SafeMathQuad {
     return _PRECISION;
   }
 
-  function div(uint256 numerator, uint256 denominator) public view returns (bytes16 result) {
+  function div(uint256 numerator, uint256 denominator) public view returns (uint256 result) {
     require(denominator != 0, 'SafeMathQuad: DIVISION BY ZERO');
     uint precision = getPrecision();
-    bytes16 num = getValueBytes(numerator, precision);
-    bytes16 denom = getValueBytes(denominator,precision);
-    return num.div(denom);
+    bytes16 num = getUintValueBytes(numerator, precision);
+    bytes16 denom = getUintValueBytes(denominator,precision);
+    return toUint(num.div(denom));
   }
 
-  function mul(uint256 arg1, uint256 arg2) public view returns (bytes16 result) {
+  function div(int256 numerator, int256 denominator) public view returns (int256 result) {
+    require(denominator != 0, 'SafeMathQuad: DIVISION BY ZERO');
     uint precision = getPrecision();
-    bytes16 a = getValueBytes(arg1, precision);
-    bytes16 b = getValueBytes(arg2, precision);
-    return a.mul(b);
+    bytes16 num = getIntValueBytes(numerator, precision);
+    bytes16 denom = getIntValueBytes(denominator,precision);
+    return toInt(num.div(denom));
   }
 
-  function add(uint256 arg1, uint256 arg2) public view returns (bytes16 result) {
+
+function div(uint256 numerator, int256 denominator) public view returns (int256 result) {
+    require(denominator != 0, 'SafeMathQuad: DIVISION BY ZERO');
     uint precision = getPrecision();
-    bytes16 a = getValueBytes(arg1, precision);
-    bytes16 b = getValueBytes(arg2, precision);
-    return a.add(b);
+    bytes16 num = getUintValueBytes(numerator, precision);
+    bytes16 denom = getIntValueBytes(denominator,precision);
+    return toInt(num.div(denom));
   }
 
-  function sub(uint256 arg1, uint256 arg2) public view returns (bytes16 result) {
+  function div(int256 numerator, uint256 denominator) public view returns (int256 result) {
+    require(denominator != 0, 'SafeMathQuad: DIVISION BY ZERO');
     uint precision = getPrecision();
-    bytes16 a = getValueBytes(arg1, precision);
-    bytes16 b = getValueBytes(arg2, precision);
-    return a.sub(b);
+    bytes16 num = getIntValueBytes(numerator, precision);
+    bytes16 denom = getUintValueBytes(denominator,precision);
+    return toInt(num.div(denom));
+  }
+
+  function mul(uint256 arg1, uint256 arg2) public view returns (uint256 result) {
+    uint precision = getPrecision();
+    bytes16 a = getUintValueBytes(arg1, precision);
+    bytes16 b = getUintValueBytes(arg2, precision);
+    return toUint(a.mul(b));
+  }
+
+  function mul(int256 arg1, int256 arg2) public view returns (int256 result) {
+    uint precision = getPrecision();
+    bytes16 a = getIntValueBytes(arg1, precision);
+    bytes16 b = getIntValueBytes(arg2, precision);
+    return toInt(a.mul(b));
+  }
+
+  function mul(uint256 arg1, int256 arg2) public view returns (int256 result) {
+    uint precision = getPrecision();
+    bytes16 a = getUintValueBytes(arg1, precision);
+    bytes16 b = getIntValueBytes(arg2, precision);
+    return toInt(a.mul(b));
+  }
+
+  function mul(int256 arg1, uint256 arg2) public view returns (int256 result) {
+    uint precision = getPrecision();
+    bytes16 a = getIntValueBytes(arg1, precision);
+    bytes16 b = getUintValueBytes(arg2, precision);
+    return toInt(a.mul(b));
+  }
+
+  function add(uint256 arg1, uint256 arg2) public view returns (uint256 result) {
+    uint precision = getPrecision();
+    bytes16 a = getUintValueBytes(arg1, precision);
+    bytes16 b = getUintValueBytes(arg2, precision);
+    return toUint(a.add(b));
+  }
+
+  function add(int256 arg1, int256 arg2) public view returns (int256 result) {
+    uint precision = getPrecision();
+    bytes16 a = getIntValueBytes(arg1, precision);
+    bytes16 b = getIntValueBytes(arg2, precision);
+    return toInt(a.add(b));
+  }
+
+  function sub(uint256 arg1, uint256 arg2) public view returns (uint256 result) {
+    uint precision = getPrecision();
+    bytes16 a = getUintValueBytes(arg1, precision);
+    bytes16 b = getUintValueBytes(arg2, precision);
+    return toUint(a.sub(b));
+  }
+
+  function sub(int256 arg1, int256 arg2) public view returns (int256 result) {
+    uint precision = getPrecision();
+    bytes16 a = getIntValueBytes(arg1, precision);
+    bytes16 b = getIntValueBytes(arg2, precision);
+    return toInt(a.sub(b));
+  }
+
+  function sub(uint256 arg1, int256 arg2) public view returns (int256 result) {
+    uint precision = getPrecision();
+    bytes16 a = getUintValueBytes(arg1, precision);
+    bytes16 b = getIntValueBytes(arg2, precision);
+    return toInt(a.sub(b));
+  }
+
+  function abs(int256 x) public view returns (uint256 result) {
+    uint precision = getPrecision();
+    bytes16 val = getIntValueBytes(x, precision);
+    return toUint(ABDKMathQuad.abs(val));
+  }
+
+  function neg(uint256 x) public view returns (int256 result) {
+    uint precision = getPrecision();
+    bytes16 val = getUintValueBytes(x, precision);
+    bytes16 n1 = getIntValueBytes(-1, precision);
+    bytes16 resBytes = val.mul(n1);
+    return toInt(resBytes);
   }
 
 }
