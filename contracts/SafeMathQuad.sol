@@ -11,6 +11,7 @@ library SafeMathQuad {
   uint constant public _PRECISION = _DEFAULT_PRECISION;
 
   function toInt(bytes16 num) public pure returns (int256 result) {
+    // require(false, "called toInt");
     return ABDKMathQuad.to128x128(num);
   }
 
@@ -30,14 +31,14 @@ library SafeMathQuad {
 
   function getIntValueBytes(int256 val, uint precision) public pure returns (bytes16 valBytes) {
     bytes16 byteVal = ABDKMathQuad.fromInt(val);
-      if (precision > 0) {
-          int p = 10;
-          for(uint i=0; i < precision; i++){
-            p*=10;
-          }
-          bytes16 bytePrec = ABDKMathQuad.fromInt(p);
-          byteVal = byteVal.div(bytePrec);
-      }
+    if (precision > 0) {
+        int p = 10;
+        for(uint i=0; i < precision; i++){
+          p*=10;
+        }
+        bytes16 bytePrec = ABDKMathQuad.fromInt(p);
+        byteVal = byteVal.div(bytePrec);
+    }
       return byteVal;
   }
 
@@ -146,10 +147,16 @@ function div(uint256 numerator, int256 denominator) public view returns (int256 
   }
 
   function sub(int256 arg1, int256 arg2) public view returns (int256 result) {
+    // require(false, "called sub int");
     uint precision = getPrecision();
+    // require(false,"got precision");
     bytes16 a = getIntValueBytes(arg1, precision);
     bytes16 b = getIntValueBytes(arg2, precision);
-    return toInt(a.sub(b));
+    // require(false,"converted");
+    bytes16 res = a.sub(b);
+    // require(false, "subtracted");
+    result = toInt(res);
+    // require(false, "converted to int");
   }
 
   function sub(uint256 arg1, int256 arg2) public view returns (int256 result) {

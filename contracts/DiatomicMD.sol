@@ -9,12 +9,14 @@ pragma solidity >=0.8.7 <0.9.0;
  */
 
 import "./SafeMathQuad.sol";
+// import "truffle/console.sol";
+import "./ABDKMathQuad.sol";
 
 contract DiatomicMD {
 
-  using SafeMathQuad for uint256;
-  using SafeMathQuad for int256;
-  using SafeMathQuad for bytes16;
+  // using SafeMathQuad for uint256;
+  // using SafeMathQuad for int256;
+  using ABDKMathQuad for bytes16;
 
 
   // Output object.
@@ -24,55 +26,56 @@ contract DiatomicMD {
   }
 
   // Current run counter.
-  uint256 public runCount;
+  uint256 private runCount;
 
   // Stored simulation output data.
-  mapping (uint256 => uint256[]) simulationOutput;
+  mapping (uint256 => uint256[]) private simulationOutput;
 
   // Input Variables
-  int256 Re;
-  int256 R1;
-  int256 R2;
-  uint256 K;
-  uint256 M1;
-  uint256 M2;
-  uint256 dT;
-  int256 v1;
-  int256 v2;
+  bytes16 Re;
+  bytes16 R1;
+  bytes16 R2;
+  bytes16 K;
+  bytes16 M1;
+  bytes16 M2;
+  bytes16 dT;
+  bytes16 v1;
+  bytes16 v2;
 
   // Pre-Calculated Variables
-  uint256 dTdTbyM1x2;
-  uint256 dTdTbyM2x2;
-  uint256 dTbyM1x2;
-  uint256 dTbyM2x2;
+  bytes16 dTdTbyM1x2;
+  bytes16 dTdTbyM2x2;
+  bytes16 dTbyM1x2;
+  bytes16 dTbyM2x2;
 
   // Process Variables
-  int256 r;
-  uint256 rMag;
-  int256 f;
-  int256 fNew;
+  bytes16 r;
+  bytes16 rMag;
+  bytes16 f;
+  bytes16 fNew;
 
   // initial vals
-  int256 Re_0;
-  int256 R1_0;
-  int256 R2_0;
-  uint256 K_0;
-  uint256 M1_0;
-  uint256 M2_0;
-  uint256 dT_0;
-  int256 v1_0;
-  int256 v2_0;
-  uint256 dTdTbyM1x2_0;
-  uint256 dTdTbyM2x2_0;
-  uint256 dTbyM1x2_0;
-  uint256 dTbyM2x2_0;
-  int256 r_0;
-  uint256 rMag_0;
-  int256 f_0;
-  int256 fNew_0;
+  bytes16 Re_0;
+  bytes16 R1_0;
+  bytes16 R2_0;
+  bytes16 K_0;
+  bytes16 M1_0;
+  bytes16 M2_0;
+  bytes16 dT_0;
+  bytes16 v1_0;
+  bytes16 v2_0;
+  bytes16 dTdTbyM1x2_0;
+  bytes16 dTdTbyM2x2_0;
+  bytes16 dTbyM1x2_0;
+  bytes16 dTbyM2x2_0;
+  bytes16 r_0;
+  bytes16 rMag_0;
+  bytes16 f_0;
+  bytes16 fNew_0;
 
   // constants
-  uint256 private constant two = 2;
+  bytes16 private constant two = 0x00000000000000000000000000000002;
+
 
   constructor() {
     bytes16 eqBondLen = SafeMathQuad.getUintValueBytes(21316,4);
@@ -81,8 +84,7 @@ contract DiatomicMD {
     bytes16 atomOne = SafeMathQuad.getUintValueBytes(21875, 0);
     bytes16 atomTwo = SafeMathQuad.getUintValueBytes(291569457, 4);
     bytes16 timestep = SafeMathQuad.getUintValueBytes(413, 2);
-    defaultValues(SafeMathQuad.toInt(eqBondLen), SafeMathQuad.toInt(initBondLen), SafeMathQuad.toUint(forceConst), 
-    SafeMathQuad.toUint(atomOne), SafeMathQuad.toUint(atomTwo), SafeMathQuad.toUint(timestep));
+    defaultValues(eqBondLen, initBondLen, forceConst, atomOne, atomTwo, timestep);
   }
 
   /// @param eqBondLen Equilibrium bond length in a_0.
@@ -91,7 +93,7 @@ contract DiatomicMD {
   /// @param atomOne Mass of atom one in m_e. 
   /// @param atomTwo Mass of atom two in m_e.
   /// @param timestep Time step in hbar/E_h.
-  function defaultValues(int256 eqBondLen, int256 initBondLen, uint256 forceConst, uint256 atomOne, uint256 atomTwo, uint256 timestep) internal {
+  function defaultValues(bytes16 eqBondLen, bytes16 initBondLen, bytes16 forceConst, bytes16 atomOne, bytes16 atomTwo, bytes16 timestep) internal {
     
       Re = eqBondLen;
       Re_0 = Re;
@@ -141,23 +143,32 @@ contract DiatomicMD {
   /// @param steps Number of steps in time in units of 0.1 femtosecond.
   /// @param precision Number of decimal places to include in output.
   function runMd(uint256 steps, uint precision) public returns (DiatomicMDOutput memory) {
+      // require(false, "runMd");
       reset();
-
-      uint256 multiplier = 10**precision;
+      // require(false, "ran reset");
+      bytes16 multiplier = SafeMathQuad.getUintValueBytes(10**precision,0);
       uint256[] memory results = new uint256[](steps);
+      // require(false, "created results");
       for (uint t=0; t<steps; t++) {
+        // require(false, "started loop");
         r = R1.sub(R2);
-        rMag = SafeMathQuad.abs(r);
-        int256 nK = SafeMathQuad.neg(K);
+        // require(false, "sub");
+        rMag = ABDKMathQuad.abs(r);
+        bytes16 nK = ABDKMathQuad.neg(K); 
+        // require(false, "abs and neg");
         f = nK.mul(rMag.sub(Re)).mul(r).div(rMag);
+        // require(false,"got f");
+        v1 = v1.add(dTbyM1x2.mul(fNew.add(f)));
+        v2 = v2.sub(dTbyM2x2.mul(fNew.add(f)));
         R1 = R1.add(dT.mul(v1)).add(dTdTbyM1x2.mul(f));
         R2 = R2.add(dT.mul(v2)).sub(dTdTbyM2x2.mul(f));
         r = R1.sub(R2);
-        rMag = SafeMathQuad.abs(r);
+        rMag = ABDKMathQuad.abs(r);
+        // require(false,"got Rs");
         fNew = nK.mul(rMag.sub(Re)).mul(r).div(rMag);
-        v1 = v1.add(dTbyM1x2.mul(fNew.add(f)));
-        v2 = v2.sub(dTbyM2x2.mul(fNew.add(f)));
-        results[t] = rMag.mul(multiplier);
+        // emit Debug("finished updates, adding to results");
+        results[t] = SafeMathQuad.toUint(rMag.mul(multiplier));
+        // emit Debug("finished step ");
       }
       runCount++;
       simulationOutput[runCount] = results;
@@ -167,11 +178,16 @@ contract DiatomicMD {
 
     // @notice Retrieves the results of a previous run.
     /// @param runNum The number of the run to retrieve results for.
-    function getSimOutput(uint256 runNum) public view returns (DiatomicMDOutput memory output) {
+    function getSimOutput(uint256 runNum) public returns (DiatomicMDOutput memory output) {
       require(runNum > 0, "runNum must be greater than 0");
       require(runNum <= runCount, "No such run exists.");
-      output = DiatomicMDOutput(runCount,simulationOutput[runNum]);
-      return output;
+      return DiatomicMDOutput(runCount,simulationOutput[runNum]);
+    }
+
+    function getSimOutput(uint256 runNum, uint idx) public returns (uint256 output) {
+      require(runNum > 0, "runNum must be greater than 0");
+      require(runNum <= runCount, "No such run exists.");
+      return simulationOutput[runNum][idx];
     }
 
 }
