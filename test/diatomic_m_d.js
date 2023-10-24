@@ -32,7 +32,7 @@ contract("DiatomicMD", function ( accounts ) {
     assert.isTrue(true)
   });
   it("checks simulation stores results for each run at correct indeces", async function () {
-    // shouldThrow(simulationInstance.getSimOutput(1)) // no runs, so should not have output
+    shouldThrow(simulationInstance.getSimOutput(1)) // no runs, so should not have output
     await simulationInstance.runMd(1,0);
     await simulationInstance.getSimOutput(1)
     await simulationInstance.runMd(1,0, {from: alice})
