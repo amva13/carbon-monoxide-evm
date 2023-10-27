@@ -9,13 +9,10 @@ pragma solidity >=0.8.7 <0.9.0;
  */
 
 import "./SafeMathQuad.sol";
-// import "truffle/console.sol";
 import "./ABDKMathQuad.sol";
 
 contract DiatomicMD {
 
-  // using SafeMathQuad for uint256;
-  // using SafeMathQuad for int256;
   using ABDKMathQuad for bytes16;
 
 
@@ -143,32 +140,22 @@ contract DiatomicMD {
   /// @param steps Number of steps in time in units of 0.1 femtosecond.
   /// @param precision Number of decimal places to include in output.
   function runMd(uint256 steps, uint precision) public returns (DiatomicMDOutput memory) {
-      // require(false, "runMd");
       reset();
-      // require(false, "ran reset");
       bytes16 multiplier = SafeMathQuad.getUintValueBytes(10**precision,0);
       uint256[] memory results = new uint256[](steps);
-      // require(false, "created results");
       for (uint t=0; t<steps; t++) {
-        // require(false, "started loop");
         r = R1.sub(R2);
-        // require(false, "sub");
         rMag = ABDKMathQuad.abs(r);
         bytes16 nK = ABDKMathQuad.neg(K); 
-        // require(false, "abs and neg");
         f = nK.mul(rMag.sub(Re)).mul(r).div(rMag);
-        // require(false,"got f");
         v1 = v1.add(dTbyM1x2.mul(fNew.add(f)));
         v2 = v2.sub(dTbyM2x2.mul(fNew.add(f)));
         R1 = R1.add(dT.mul(v1)).add(dTdTbyM1x2.mul(f));
         R2 = R2.add(dT.mul(v2)).sub(dTdTbyM2x2.mul(f));
         r = R1.sub(R2);
         rMag = ABDKMathQuad.abs(r);
-        // require(false,"got Rs");
         fNew = nK.mul(rMag.sub(Re)).mul(r).div(rMag);
-        // emit Debug("finished updates, adding to results");
         results[t] = SafeMathQuad.toUint(rMag.mul(multiplier));
-        // emit Debug("finished step ");
       }
       runCount++;
       simulationOutput[runCount] = results;
