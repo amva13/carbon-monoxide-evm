@@ -44,7 +44,15 @@
 // require('dotenv').config();
 // const { MNEMONIC, PROJECT_ID } = process.env;
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+// const Web3 = require("web3");
+
+const privateKeys = [
+  "0xc8bc19127bf08e24e4d7dcb554efa364450cd6bdcd5177e32583fbea6a85fea4",
+  "0x9c55c06d9a78d4f60b8e6fef0fd2252e000b0b814a0cbeb17a134370676f76d8"
+];
+
+// const provider = new Web3.providers.HttpProvider("https://devnet.neonevm.org");
 
 module.exports = {
   /**
@@ -58,6 +66,16 @@ module.exports = {
    */
 
   networks: {
+    neonlabs: {
+      provider: () => {
+        return new HDWalletProvider(
+          privateKeys,
+          // provider,
+          "https://devnet.neonevm.org",
+        );
+      },
+      network_id: "*"
+    },
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache, geth, or parity) in a separate terminal
