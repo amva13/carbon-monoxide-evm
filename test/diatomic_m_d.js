@@ -40,4 +40,10 @@ contract("DiatomicMD", function ( accounts ) {
     shouldThrow(simulationInstance.getSimOutput(3)) // there was no third run, so should throw
     assert.isTrue(true)
   });
+  it("tests the mock", async function () {
+    const mockResults = await simulationInstance.getSimOutput.call();
+    const expectedLength = 17;
+    assert.equal(mockResults.length, expectedLength);
+    assert.isTrue(true)
+  });
 });

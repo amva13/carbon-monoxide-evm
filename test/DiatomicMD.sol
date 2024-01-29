@@ -20,4 +20,11 @@ contract TestDiatomicMD {
         uint length = sim.getSimOutput(3).length;
         Assert.equal(timesteps, length, "length of a simulation run results should match the number of timesteps");
     }
+    function testMock() public {
+        // Mocking the contract to make sure it works in Truffle as well
+        DiatomicMD mock = DiatomicMD(DeployedAddresses.DiatomicMD());
+        uint expectedLength = 17;
+        uint256[] memory mockResults = mock.getSimOutput();
+        Assert.equal(expectedLength, mockResults.length, "the expected length is 15");
+    }
 }

@@ -16,6 +16,10 @@ contract DiatomicMD {
   using ABDKMathQuad for bytes16;
 
 
+  // for mocking only
+  uint256[] private mockResults;
+
+
   // Output object.
   struct DiatomicMDOutput {
       uint256 runNum;
@@ -175,6 +179,27 @@ contract DiatomicMD {
       require(runNum > 0, "runNum must be greater than 0");
       require(runNum <= runCount, "No such run exists.");
       return simulationOutput[runNum][idx];
+    }
+
+    // @notice mocks functionality by returning a fixed array of results
+    function getSimOutput() public returns (uint256[] memory) {
+      uint timesteps = 3;
+      uint numValues = 5;
+      uint arrLength = timesteps * numValues + 2;
+      mockResults = new  uint256[](arrLength);
+      uint256 startCt = runCount+1;
+      for (uint i=0; i<timesteps; i++) {
+        runMd(i+1, 0);
+        mockResults[numValues*i] = getSimOutput(startCt+i, i); // radius magnitude
+        mockResults[numValues*i+1] = SafeMathQuad.toUint(M2); // oxygen mass (2)
+        mockResults[numValues*i+2] = SafeMathQuad.toUint(M1); // carbon mass (1)
+        mockResults[numValues*i+3] = SafeMathQuad.toUint(v2); // oxygen v
+        mockResults[numValues*i+4] = SafeMathQuad.toUint(v1); // carbon v
+      }
+      // last 2 values are timesteps and numValues
+      mockResults[arrLength-2] = timesteps;
+      mockResults[arrLength-1] = numValues;
+      return mockResults;
     }
 
 }
