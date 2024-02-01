@@ -184,17 +184,18 @@ contract DiatomicMD {
     // @notice mocks functionality by returning a fixed array of results
     function getSimOutput() public returns (uint256[] memory) {
       uint timesteps = 3;
-      uint numValues = 5;
+      uint numValues = 6;
       uint arrLength = timesteps * numValues + 2;
       mockResults = new  uint256[](arrLength);
       uint256 startCt = runCount+1;
       for (uint i=0; i<timesteps; i++) {
         runMd(i+1, 0);
-        mockResults[numValues*i] = getSimOutput(startCt+i, i); // radius magnitude
+        mockResults[numValues*i] = getSimOutput(startCt+i, i); // radius magnitude - equillibrium
         mockResults[numValues*i+1] = SafeMathQuad.toUint(M2); // oxygen mass (2)
         mockResults[numValues*i+2] = SafeMathQuad.toUint(M1); // carbon mass (1)
         mockResults[numValues*i+3] = SafeMathQuad.toUint(v2); // oxygen v
         mockResults[numValues*i+4] = SafeMathQuad.toUint(v1); // carbon v
+        mockResults[numValues*i+5] = SafeMathQuad.toUint(R1); // radius magnitude - non-equillibrium
       }
       // last 2 values are timesteps and numValues
       mockResults[arrLength-2] = timesteps;

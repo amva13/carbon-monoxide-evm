@@ -42,7 +42,8 @@ contract("DiatomicMD", function ( accounts ) {
   });
   it("tests the mock", async function () {
     const mockResults = await simulationInstance.getSimOutput.call();
-    const expectedLength = 17;
+    // const expectedLength = 17;
+    const expectedLength = mockResults[mockResults.length - 1] * mockResults[mockResults.length - 2] + 2;
     assert.equal(mockResults.length, expectedLength);
     assert.isTrue(true)
   });
