@@ -183,7 +183,7 @@ contract DiatomicMD {
 
     // @notice mocks functionality by returning a fixed array of results
     function getSimOutput() public returns (uint256[] memory) {
-      uint timesteps = 3;
+      uint timesteps = 10;
       uint numValues = 6;
       uint arrLength = timesteps * numValues + 2;
       mockResults = new  uint256[](arrLength);
