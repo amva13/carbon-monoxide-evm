@@ -60,6 +60,14 @@ library SafeMathQuad {
     return out;
   }
 
+  function convertBytesToUints(bytes16[] memory bvalues) public pure returns (uint256[] memory res) {
+    uint256[] memory out = new uint256[](bvalues.length);
+    for (uint j=0; j < bvalues.length; j++) {
+      out[j] = ABDKMathQuad.toUInt(bvalues[j]);
+    }
+    return out;
+  }
+
   function getPrecision() public view returns(uint precision) {
     return _PRECISION;
   }
