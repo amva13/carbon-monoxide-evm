@@ -17,20 +17,20 @@ contract DiatomicMD {
 
 
   // for mocking only
-  bytes16[] private mockResults;
+  uint256[] private mockResults;
 
 
   // Output object.
   struct DiatomicMDOutput {
       uint256 runNum;
-      bytes16[] outputData;
+      uint256[] outputData;
   }
 
   // Current run counter.
   uint256 private runCount;
 
   // Stored simulation output data.
-  mapping (uint256 => bytes16[]) private simulationOutput;
+  mapping (uint256 => uint256[]) private simulationOutput;
 
   // Input Variables
   bytes16 Re;
@@ -146,7 +146,7 @@ contract DiatomicMD {
   function runMd(uint256 steps, uint precision) public returns (DiatomicMDOutput memory) {
       reset();
       bytes16 multiplier = SafeMathQuad.getUintValueBytes(10**precision,0);
-      bytes16[] memory results = new bytes16[](steps);
+      uint256[] memory results = new uint256[](steps);
       for (uint t=0; t<steps; t++) {
         r = R1.sub(R2);
         rMag = ABDKMathQuad.abs(r);
@@ -159,7 +159,7 @@ contract DiatomicMD {
         r = R1.sub(R2);
         rMag = ABDKMathQuad.abs(r);
         fNew = nK.mul(rMag.sub(Re)).mul(r).div(rMag);
-        results[t] = rMag.mul(multiplier);
+        results[t] = SafeMathQuad.toUint(rMag.mul(multiplier));
       }
       runCount++;
       simulationOutput[runCount] = results;
@@ -172,32 +172,33 @@ contract DiatomicMD {
     function getSimOutput(uint256 runNum) public view returns (uint256[] memory output) {
       require(runNum > 0, "runNum must be greater than 0");
       require(runNum <= runCount, "No such run exists.");
-      return SafeMathQuad.convertBytesToUints(simulationOutput[runNum]);
+      return simulationOutput[runNum];
     }
 
     function getSimOutput(uint256 runNum, uint idx) public view returns (uint256 output) {
       require(runNum > 0, "runNum must be greater than 0");
       require(runNum <= runCount, "No such run exists.");
-      return simulationOutput[runNum][idx].toUInt();
+      return simulationOutput[runNum][idx];
     }
 
     // @notice mocks functionality by returning a fixed array of results
-    function getSimOutput() public returns (bytes16[] memory) {
+    function getSimOutput() public returns (uint256[] memory) {
       uint timesteps = 3;
       uint numValues = 5;
       uint arrLength = timesteps * numValues + 2;
-      mockResults = new  bytes16[](arrLength);
+      mockResults = new  uint256[](arrLength);
+      uint256 startCt = runCount+1;
       for (uint i=0; i<timesteps; i++) {
-        DiatomicMDOutput memory dmdOut = runMd(i+1, 0);
-        mockResults[numValues*i] = dmdOut.outputData[i]; // radius magnitude
-        mockResults[numValues*i+1] = M2; // oxygen mass (2)
-        mockResults[numValues*i+2] = M1; // carbon mass (1)
-        mockResults[numValues*i+3] = v2; // oxygen v
-        mockResults[numValues*i+4] = v1; // carbon v
+        runMd(i+1, 0);
+        mockResults[numValues*i] = getSimOutput(startCt+i, i); // radius magnitude
+        mockResults[numValues*i+1] = SafeMathQuad.toUint(M2); // oxygen mass (2)
+        mockResults[numValues*i+2] = SafeMathQuad.toUint(M1); // carbon mass (1)
+        mockResults[numValues*i+3] = SafeMathQuad.toUint(v2); // oxygen v
+        mockResults[numValues*i+4] = SafeMathQuad.toUint(v1); // carbon v
       }
       // last 2 values are timesteps and numValues
-      mockResults[arrLength-2] = SafeMathQuad.getUintValueBytes(timesteps,0);
-      mockResults[arrLength-1] = SafeMathQuad.getUintValueBytes(numValues,0);
+      mockResults[arrLength-2] = timesteps;
+      mockResults[arrLength-1] = numValues;
       return mockResults;
     }
 
