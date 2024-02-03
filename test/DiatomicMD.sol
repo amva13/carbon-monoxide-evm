@@ -24,8 +24,8 @@ contract TestDiatomicMD {
         // Mocking the contract to make sure it works in Truffle as well
         DiatomicMD mock = DiatomicMD(DeployedAddresses.DiatomicMD());
         // uint expectedLength = 17;
-        uint256[] memory mockResults = mock.getSimOutput();
-        uint expectedLength = mockResults[mockResults.length-1] * mockResults[mockResults.length-2] + 2;
+        int256[] memory mockResults = mock.getSimOutput();
+        uint expectedLength = uint(mockResults[mockResults.length-1]) * uint(mockResults[mockResults.length-2]) + 2;
         Assert.equal(expectedLength, mockResults.length, "the length is incorrect");
     }
 }

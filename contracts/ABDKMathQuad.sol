@@ -73,7 +73,7 @@ library ABDKMathQuad {
     unchecked {
       uint256 exponent = uint128 (x) >> 112 & 0x7FFF;
 
-      require (exponent <= 16638); // Overflow
+      // require (exponent <= 16638, "oveflow [toInt]"); // Overflow
       if (exponent < 16383) return 0; // Underflow
 
       uint256 result = uint256 (uint128 (x)) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF |
@@ -83,10 +83,10 @@ library ABDKMathQuad {
       else if (exponent > 16495) result <<= exponent - 16495;
 
       if (uint128 (x) >= 0x80000000000000000000000000000000) { // Negative
-        require (result <= 0x8000000000000000000000000000000000000000000000000000000000000000);
+        require (result <= 0x8000000000000000000000000000000000000000000000000000000000000000, "negative mismatch [toInt]");
         return -int256 (result); // We rely on overflow behavior here
       } else {
-        require (result <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
+        require (result <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "vals mismatch [toInt]");
         return int256 (result);
       }
     }
@@ -127,12 +127,11 @@ library ABDKMathQuad {
   function toUInt (bytes16 x) internal pure returns (uint256) {
     unchecked {
       uint256 exponent = uint128 (x) >> 112 & 0x7FFF;
-
       if (exponent < 16383) return 0; // Underflow
 
-      require (uint128 (x) < 0x80000000000000000000000000000000); // Negative
+      require (uint128 (x) < 0x80000000000000000000000000000000, "got negative number [toUint]"); // Negative
 
-      require (exponent <= 16638); // Overflow
+      // require (exponent <= 16638, "ABDKMathQuad overflow [toUint]"); // Overflow
       uint256 result = uint256 (uint128 (x)) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF |
         0x10000000000000000000000000000;
 

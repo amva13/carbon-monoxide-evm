@@ -12,7 +12,7 @@ library SafeMathQuad {
 
   function toInt(bytes16 num) public pure returns (int256 result) {
     // require(false, "called toInt");
-    return ABDKMathQuad.to128x128(num);
+    return ABDKMathQuad.toInt(num);
   }
 
   function toUint(bytes16 num) public pure returns (uint256 result) {
