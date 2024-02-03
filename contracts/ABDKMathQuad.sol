@@ -73,7 +73,7 @@ library ABDKMathQuad {
     unchecked {
       uint256 exponent = uint128 (x) >> 112 & 0x7FFF;
 
-      // require (exponent <= 16638, "oveflow [toInt]"); // Overflow
+      require (exponent <= 16638, "oveflow [toInt]"); // Overflow
       if (exponent < 16383) return 0; // Underflow
 
       uint256 result = uint256 (uint128 (x)) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF |
@@ -131,7 +131,7 @@ library ABDKMathQuad {
 
       require (uint128 (x) < 0x80000000000000000000000000000000, "got negative number [toUint]"); // Negative
 
-      // require (exponent <= 16638, "ABDKMathQuad overflow [toUint]"); // Overflow
+      require (exponent <= 16638, "ABDKMathQuad overflow [toUint]"); // Overflow
       uint256 result = uint256 (uint128 (x)) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF |
         0x10000000000000000000000000000;
 
@@ -179,7 +179,7 @@ library ABDKMathQuad {
     unchecked {
       uint256 exponent = uint128 (x) >> 112 & 0x7FFF;
 
-      require (exponent <= 16510); // Overflow
+      require (exponent <= 16510, "overflow [to128x128]"); // Overflow
       if (exponent < 16255) return 0; // Underflow
 
       uint256 result = uint256 (uint128 (x)) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF |

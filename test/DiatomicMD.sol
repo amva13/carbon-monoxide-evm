@@ -9,8 +9,8 @@ contract TestDiatomicMD {
         DiatomicMD sim = DiatomicMD(DeployedAddresses.DiatomicMD());
         sim.runMd(1,0);
         sim.runMd(1,0);
-        uint256 out1 = sim.getSimOutput(1, 0);
-        uint256 out2 = sim.getSimOutput(2, 0);
+        uint128 out1 = sim.getSimOutput(1, 0);
+        uint128 out2 = sim.getSimOutput(2, 0);
         Assert.equal(out1, out2, "simulations with same timesteps and precision should have same result");
     }
     function testSimulationResultsLength() public {
@@ -24,7 +24,7 @@ contract TestDiatomicMD {
         // Mocking the contract to make sure it works in Truffle as well
         DiatomicMD mock = DiatomicMD(DeployedAddresses.DiatomicMD());
         // uint expectedLength = 17;
-        int256[] memory mockResults = mock.getSimOutput();
+        uint128[] memory mockResults = mock.getSimOutput();
         uint expectedLength = uint(mockResults[mockResults.length-1]) * uint(mockResults[mockResults.length-2]) + 2;
         Assert.equal(expectedLength, mockResults.length, "the length is incorrect");
     }

@@ -30,7 +30,7 @@ library SafeMathQuad {
   }
 
   function getIntValueBytes(int256 val, uint precision) public pure returns (bytes16 valBytes) {
-    bytes16 byteVal = ABDKMathQuad.fromInt(val);
+    bytes16 byteVal = ABDKMathQuad.from128x128(val);
     if (precision > 0) {
         int p = 10;
         for(uint i=0; i < precision; i++){
