@@ -195,7 +195,8 @@ contract DiatomicMD {
         // bytes16 resPre = rMag.mul(multiplier);
         // require(false, "applied multiplier");
         // int256 resInt = SafeMathQuad.toInt(rMag);
-        uint128 resInt128 = uint128(rMag);
+        bytes16 res = rMag.div(multiplier);
+        uint128 resInt128 = uint128(res);
         // require(false, "converted to int");
         results[t] = resInt128;
         // require(false, "added to results");
@@ -230,7 +231,7 @@ contract DiatomicMD {
       mockResults = new  uint128[](arrLength);
       uint256 startCt = runCount+1;
       for (uint i=0; i<timesteps; i++) {
-        runMd(i+1, 0);
+        runMd(i+1, 10);
         mockResults[numValues*i] = uint128(getSimOutput(startCt+i, i)); // radius magnitude - equillibrium
         // require(false, "got sim output");
         mockResults[numValues*i+1] = uint128(M2); // oxygen mass (2)
